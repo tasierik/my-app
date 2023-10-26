@@ -1,0 +1,29 @@
+name: Publish package
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+      - run: |
+          git config --global user.name "Erik Tasi"
+          git config --global user.email "tasi.erik15@gmail.com"
+      - run: |
+          echo '@tasierik:registry=https://npm.pkg.github.com' > .npmrc
+          echo 'always-auth=true'
+          echo '//npm.pkg.github.com/:_authToken=${{secrets.MY_PAT}}' >> .npmrc
+      - run: |
+          npm i
+          npm i @tasierik/my-package
+      - run: |
+          git add .
+          git commit -m "Update dependencies"
+          git push
